@@ -78,7 +78,7 @@ async function runClarified(ai: AI, dbs: DBs) {
   return response;
 }
 
-export const STEPS = [clarify, runClarified];
+export const STEPS = {clarify, runClarified};
 
 // Future steps that can be added:
 // improveFiles,

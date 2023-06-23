@@ -10,6 +10,6 @@
       "sourceMap": true,
       "types": [ "node" ]
     },
-    "include": ["start", "libs", "apps", "agents", "libs"],
+    "include": ["start", "libs", "apps", "agents", "libs", "config"],
     "exclude": ["node_modules"]
   }

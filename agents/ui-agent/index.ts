@@ -1,12 +1,16 @@
 import * as amqp from 'amqplib';
-import { AI } from '../../libs/ai'
-import { STEPS } from '../../libs/question'
+import { AI, STEPS, createSend } from '../../libs'
+import { queueNames } from '../../config'
 import { createDbs } from './dbs';
+
 import path from 'path';
 
 // Function to process project descriptions and generate use cases
 async function processProjectDescriptions() {
-  
+  // Db
+  const basePath = path.join(process.cwd(), 'agents', 'ui-agent', 'db');
+  const dbs = createDbs(basePath)
+
   // RabbitMQ connection URL
   const rabbitmqUrl = 'amqp://localhost';
   
@@ -16,20 +20,18 @@ async function processProjectDescriptions() {
   
   // Create an instance of the OpenAI API client  
   // Define the queue name
-  const queueName = 'project_queue';  
-
   try {
     // Connect to RabbitMQ
     const connection = await amqp.connect(rabbitmqUrl);
     const channel = await connection.createChannel();
 
     // Ensure the queue exists
-    await channel.assertQueue(queueName);
+    await channel.assertQueue(queueNames.project);
 
     console.log('Agent is waiting for project descriptions...');
 
     // Consume messages from the queue
-    channel.consume(queueName, async (message: any) => {
+    channel.consume(queueNames.project, async (message: any) => {
       const projectDescription = JSON.parse(message.content.toString());
 
       // TODO: Use the project description to generate basic UI using the OpenAI API
@@ -37,16 +39,22 @@ async function processProjectDescriptions() {
         model,
         temperature,
       });
-      const basePath = path.join(process.cwd(), 'agents', 'ui-agent', 'db');
-      const dbs = createDbs(basePath)
 
-      for (const step of STEPS) {
+      // create method to send UI output to UI channel
+      const sendMsg = createSend(channel, queueNames.ui, 'ui')
+
+      const promises = Object.keys(STEPS).map(async (key) => {
+        const step: any = (STEPS as any)[key];
         const messages = await step(ai, dbs);
-        dbs.logs.setItem(step.name, JSON.stringify(messages));
-      }
-
-      console.log('Use cases generated:', dbs.logs);
-
+        const text = JSON.stringify(messages)
+        dbs.logs.setItem(step.name, text);
+        
+        const msgList = messages.map((m: any) => message.content);
+        console.log('UI output generated:', msgList);        
+        // send output returned from step to UI channel
+        await sendMsg({messages: msgList});
+      });
+      await Promise.all(promises);
       // Acknowledge the message to remove it from the queue
       channel.ack(message);
     });
