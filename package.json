@@ -1,0 +1,21 @@
+{
+  "name": "gpt-teamwork",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/amqplib": "^0.10.1",
+    "amqplib": "^0.10.3",
+    "dotenv": "^16.3.1",
+    "openai": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.3.1"
+  }
+}
