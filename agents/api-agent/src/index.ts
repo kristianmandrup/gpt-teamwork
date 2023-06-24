@@ -40,7 +40,8 @@ async function processProjectDescriptions() {
       });
 
       // create method to send UI output to UI channel
-      const sendMsg = createSend(channel, queueNames.api, 'api')
+      const sendApiMsg = createSend(channel, queueNames.api, 'api')
+      const sendDeliverable = createSend(channel, queueNames.deliverables, 'api')
 
       const promises = Object.keys(STEPS).map(async (key) => {
         const step: any = (STEPS as any)[key];
@@ -49,9 +50,15 @@ async function processProjectDescriptions() {
         dbs.logs.setItem(step.name, text);
         
         const msgList = messages.map((m: any) => message.content);
+
+        if (text.match(/-DELIVERABLE-/)) {
+          // for fs writer agent to process
+          await sendDeliverable({messages: msgList})
+        }
+        
         console.log('API output generated:', msgList);        
         // send output returned from step to UI channel
-        await sendMsg({messages: msgList});
+        await sendApiMsg({messages: msgList});
       });
       await Promise.all(promises);
       // Acknowledge the message to remove it from the queue

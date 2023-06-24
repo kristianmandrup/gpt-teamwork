@@ -56,8 +56,6 @@ Current agents:
 - `@gpt-team/api-agent` with responsibility to deliver API functionality
 - `@gpt-team/fs-writer` with responsibility to extract file info from deliverables and write to file system
   
-### Config
-
 ### Shared Libs
 
 The `libs` folder contains functionality that can be reused across agents and apps.
@@ -68,6 +66,23 @@ The `@gpt-team/ai` library contains AI functionality (currently from `GPT-engine
 
 The `@gpt-team/db` library contains DB functionality to maintain AI context, logging etc.
 
+### Channels
+
+Currently the following channels are available
+
+- `all` for messages to be made available to all (broadcast)
+- `architect` for architecture tasks
+- `product` for product tasks
+- `project` for project info and tasks
+- `ui` for general UI/UX tasks
+- `frontend` for general FE tasks
+- `backend` for general BE tasks
+- `devops` for DevOps tasks including CI/CD and deployment configuration
+- `api` for API tasks
+- `services` for service tasks
+- `db` for DB/storage related tasks
+- `deliverables` to deliver deliverables
+- `status` to monitor and check product status
 
 ### Tests
 

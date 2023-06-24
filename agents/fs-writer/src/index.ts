@@ -25,10 +25,11 @@ async function processOutputs() {
     const channel = await connection.createChannel();
 
     // Ensure the queue exists
-    await channel.assertQueue(queueNames.project);
-    const sendMsg = createSend(channel, queueNames.project, 'fs-writer')
+    await channel.assertQueue(queueNames.deliverables);
 
-    console.log('Agent is waiting for project descriptions...');
+    const sendMsg = createSend(channel, queueNames.status, 'fs-writer')
+
+    console.log('FS write Agent is waiting for deliverables...');
 
     // Consume messages from the queue
     channel.consume(queueNames.all, async (message: any) => {
