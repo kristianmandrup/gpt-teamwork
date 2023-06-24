@@ -1,0 +1,17 @@
+{
+    "name": "@gpt-team/fs-writer",
+    "private": true,
+    "sideEffects": false,
+    "main": "dist/index.js",
+    "scripts": {
+      "build": "rm -rf dist && tsc"
+    },
+    "dependencies": {
+      "amqplib": "^0.10.3",
+      "@gpt-team/channel": "workspace:*",
+      "@gpt-team/ai": "workspace:*"
+    },
+    "devDependencies": {
+      "@types/amqplib": "^0.10.1"
+    }        
+  }

@@ -54,7 +54,8 @@ Current agents:
 
 - `@gpt-team/ui-agent` with responsibility to deliver UI functionality
 - `@gpt-team/api-agent` with responsibility to deliver API functionality
-
+- `@gpt-team/fs-writer` with responsibility to extract file info from deliverables and write to file system
+  
 ### Config
 
 ### Shared Libs
