@@ -1,32 +1,36 @@
 import { DB } from '@gpt-team/db'
 
-export function parseChat(chat: string): [string, string][] {
+export type FileInfo = {
+  path: string
+  content: string
+}
+
+export function parseChat(chat: string): FileInfo[] {
   const regex = /```(.*?)```/gs;
   const matches = chat.matchAll(regex);
 
-  const files: [string, string][] = [];
+  const files: FileInfo[] = [];
   for (const match of matches) {
     const path = match[1].split('\n')[0];
-    const code = match[1].split('\n').slice(1).join('\n');
-    files.push([path, code]);
+    const content = match[1].split('\n').slice(1).join('\n');
+    files.push({path, content });
   }
 
   return files;
 }
   
-export function filesToFileSystem(workspace: DB, files: [string, string][]): void {
-  for (const [fileName, fileContent] of files) {
-    workspace.setItem(fileName, fileContent);
+export function filesToFileSystem(workspace: DB, files: FileInfo[]): void {
+  for (const {path, content } of files) {
+    workspace.setItem(path, content);
   }
 }
-
 
 export function toFiles(workspace: DB, chat?: string): void {
   if (!chat) return;
   workspace.setItem('all_output.txt', chat);
 
   const files = parseChat(chat);
-  for (const [fileName, fileContent] of files) {
-    workspace.setItem(fileName, fileContent);
+  for (const {path, content } of files) {
+    workspace.setItem(path, content);
   }
 }
