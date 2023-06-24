@@ -1,3 +1,5 @@
+export {queueNames } from './config'
+
 export interface MsgPayload {
     messages: string[], 
     meta?: Record<string, any>

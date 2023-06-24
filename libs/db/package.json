@@ -1,0 +1,9 @@
+{
+    "name": "@gpt-team/db",
+    "private": true,
+    "sideEffects": false,
+    "main": "dist/index.js",
+    "scripts": {
+      "build": "rm -rf dist && tsc"
+    }
+  }

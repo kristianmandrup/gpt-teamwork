@@ -1,4 +1,4 @@
-import { DB } from '../db'
+import { DB } from '@gpt-team/db'
 
 export function parseChat(chat: string): [string, string][] {
     const regex = /```(.*?)```/gs;

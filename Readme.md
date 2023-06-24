@@ -30,8 +30,9 @@ The workspaces are:
 
 `agents`
 `apps`
-`config`
 `libs`
+
+See [Setup a monorepo with pnpm & add Nx for speed](https://blog.nrwl.io/setup-a-monorepo-with-pnpm-workspaces-and-speed-it-up-with-nx-bc5d97258a7e)
 
 ### Apps
 
@@ -49,13 +50,23 @@ Each agent:
 - can use OpenAI or any other method to generate outputs
 - should share their output with the rest of the team on an output queue
 
-### Config
+Current agents:
 
-The `config` folder contains shared configuration, currently just a list of queue names
+- `@gpt-team/ui-agent` with responsibility to deliver UI functionality
+- `@gpt-team/api-agent` with responsibility to deliver API functionality
+
+### Config
 
 ### Shared Libs
 
 The `libs` folder contains functionality that can be reused across agents and apps.
+
+The `@gpt-team/channel` library contains messaging channel functionality, including shared configuration (currently just a list of queue names).
+
+The `@gpt-team/ai` library contains AI functionality (currently from `GPT-engineer`).
+
+The `@gpt-team/db` library contains DB functionality to maintain AI context, logging etc.
+
 
 ### Tests
 

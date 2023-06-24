@@ -1,6 +1,6 @@
 import { AI}  from '../ai';
 import { toFiles } from '../response-parser';
-import { DBs } from '../db/dbs';
+import { DBs } from '../../db/src/dbs';
 
 const readline = require('readline');
 
