@@ -56,6 +56,12 @@ Current agents:
 - `@gpt-team/api-agent` with responsibility to deliver API functionality
 - `@gpt-team/fs-writer` with responsibility to extract file info from deliverables and write to file system
   
+One of the primary goals of each agent is to create deliverables that can be written to the file system as project artifacts.
+
+Output that is a deliverables should be marked with `[-DELIVERABLE-]`. The `fs-writer` agent will recognize this marker and use it to parse the output for file info and write the file to disk.
+
+This could further be expanded to include writing files to local and remote git repos etc.  
+
 ### Shared Libs
 
 The `libs` folder contains functionality that can be reused across agents and apps.
@@ -81,7 +87,7 @@ Currently the following channels are available
 - `api` for API tasks
 - `services` for service tasks
 - `db` for DB/storage related tasks
-- `deliverables` to deliver deliverables
+- `deliverables` for deliverables
 - `status` to monitor and check product status
 
 ### Tests
