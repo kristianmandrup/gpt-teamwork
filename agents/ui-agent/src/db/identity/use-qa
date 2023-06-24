@@ -4,9 +4,18 @@ First lay out the names of the core classes, functions, methods that will be nec
 Then output the content of each file, with syntax below.
 (You will start with the "entrypoint" file, then go to the ones that are imported by that file, and so on.)
 Make sure that files contain all imports, types, variables etc. The code should be fully functional. If anything is unclear, just make assumptions. Make sure that code in different files are compatible with each other.
+
 Before you finish, double check that all parts of the architecture is present in the files.
 
+Mark each deliverable file type as either `PAGE` or `COMPONENT`
+
+Mark each file output with DELIVERABLE in brackets as shown below to make it clear it is a final output to be stored.
+
 File syntax:
+
+[-DELIVERABLE-]
+
+type: [deliverable type here]
 
 ```filename.ts/html/css
 [ADD YOUR CODE HERE]
