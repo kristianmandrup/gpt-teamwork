@@ -1,11 +1,21 @@
 module.exports = {
   apps : [{
     name: 'server',
-    script: './apps/server/index.js',
+    script: './apps/server',
     // watch: '.'
   }, {
     name: 'ui-agent',
-    script: './agents/ui-agent/index.js/',
+    script: './agents/ui-agent',
+    // watch: ['./service-worker']
+  },
+  {
+    name: 'api-agent',
+    script: './agents/ui-agent',
+    // watch: ['./service-worker']
+  },
+  {
+    name: 'fs-writer',
+    script: './agents/fs-writer',
     // watch: ['./service-worker']
   }],
 
