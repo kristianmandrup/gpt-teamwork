@@ -2,6 +2,20 @@
 
 GPT agents acting as a team, each agent with a distinct role, working on a project collaboratively, sharing output using queues.
 
+## AI team
+
+Prompt engineering examples and experiments for the AI engineering team can be found in the folder
+
+`ai-team`
+
+Example:
+
+```txt
+Please write an App component with a header, footer, left sidebar, right sidebar and top menu with navigation to sub pages. The page should have a React Router with an Outlet to display each page routed to.
+
+Each component should be placed in a separate file. Make sure that any component or functionality that is reused in multiple components is extracted into its own file and referenced. 
+```
+
 ## Quick start
 
 The apps and agents are started using [PM2](https://pm2.keymetrics.io/docs/usage/quick-start/)
