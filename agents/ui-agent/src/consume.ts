@@ -59,7 +59,7 @@ export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) 
 
     if (text.match(/-DELIVERABLE-/)) {
       // for fs writer agent to process
-      await sendDeliverable({ messages: msgList });
+      await sendDeliverable({ messages: msgList, meta: { output } });
     }
     
     for (var sendUiMsg of sendMsgs) {

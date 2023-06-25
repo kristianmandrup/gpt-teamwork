@@ -33,14 +33,14 @@ async function processOutputs() {
 
     // Consume messages from the queue
     channel.consume(queueNames.all, async (message: any) => {
-      const projectDescription = JSON.parse(message.content.toString());
+      const body = JSON.parse(message.content.toString());
 
       // Use the message to extract file info and write to file system
 
-      const text = JSON.stringify(message)
+      const text = body.message
 
       const files = parseChat(text)        
-      filesToFileSystem(dbs, files)
+      filesToFileSystem(dbs.workspace, files, body.meta)
 
       const msg = 'files written to fs'
       const meta = {

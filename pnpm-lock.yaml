@@ -124,7 +124,11 @@ importers:
         specifier: ^0.10.3
         version: 0.10.3
 
-  libs/channel: {}
+  libs/channel:
+    dependencies:
+      '@gpt-team/ai':
+        specifier: workspace:*
+        version: link:../ai
 
   libs/db: {}
 

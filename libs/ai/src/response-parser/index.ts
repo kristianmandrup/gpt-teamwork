@@ -19,7 +19,8 @@ export function parseChat(chat: string): FileInfo[] {
   return files;
 }
   
-export function filesToFileSystem(workspace: DB, files: FileInfo[]): void {
+export function filesToFileSystem(workspace: DB, files: FileInfo[], opts: any = {}): void {
+  // TODO: if output in opts is set use it to determine what the file is and where it should be put
   for (const {path, content } of files) {
     workspace.setItem(path, content);
   }
