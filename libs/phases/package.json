@@ -1,20 +1,22 @@
 {
-    "name": "@gpt-team/phases",
-    "private": true,
-    "sideEffects": false,
-    "keywords": [
-      "Phases",
-      "SDLC",
-      "tasks"
-    ],
-    "author": "",
-    "license": "ISC",    
-    "main": "dist/index.js",
-    "scripts": {
-      "build": "rm -rf dist && tsc",
-      "install": "pnpm install"
-    },
-    "dependencies": {
-      "@gpt-team/db": "workspace:*"
-    }
+  "name": "@gpt-team/phases",
+  "private": true,
+  "sideEffects": false,
+  "keywords": [
+    "Phases",
+    "SDLC",
+    "tasks"
+  ],
+  "author": "",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "install": "pnpm install"
+  },
+  "dependencies": {
+    "@gpt-team/db": "workspace:*",
+    "@types/js-yaml": "^4.0.5",
+    "js-yaml": "^4.1.0"
   }
+}

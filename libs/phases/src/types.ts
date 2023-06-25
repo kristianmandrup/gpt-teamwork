@@ -1,21 +1,20 @@
 export interface IPhases {
     loadPhases(): Promise<void>
-    nextPhase(): Promise<void>
+    nextPhase(): IPhase | undefined
 }
 
 export interface IPhase {
-    loadPhaseTasks(): Promise<void>
-    nextPhaseTask(): Promise<void>
+    loadGoal(): Promise<void>
 }
 
 export interface IPhaseTasks {
     loadTasks(): Promise<void>
-    nextTask(): Promise<void>
+    nextTask(): IPhaseTask | undefined
 }
 
 
 export interface IPhaseTask {
     loadPrompts(): Promise<void>
-    nextPrompt(): Promise<void>
+    nextPrompt(): string
 }
 

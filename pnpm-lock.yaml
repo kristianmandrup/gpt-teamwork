@@ -114,6 +114,9 @@ importers:
       '@gpt-team/db':
         specifier: workspace:*
         version: link:../db
+      '@gpt-team/phases':
+        specifier: workspace:*
+        version: link:../phases
       amqplib:
         specifier: ^0.10.3
         version: 0.10.3
@@ -121,6 +124,18 @@ importers:
   libs/channel: {}
 
   libs/db: {}
+
+  libs/phases:
+    dependencies:
+      '@gpt-team/db':
+        specifier: workspace:*
+        version: link:../db
+      '@types/js-yaml':
+        specifier: ^4.0.5
+        version: 4.0.5
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.0
 
   start/cli:
     dependencies:
@@ -376,6 +391,10 @@ packages:
       '@types/node': 20.3.1
     dev: true
 
+  /@types/js-yaml@4.0.5:
+    resolution: {integrity: sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==}
+    dev: false
+
   /@types/node@20.3.1:
     resolution: {integrity: sha512-EhcH/wvidPy1WeML3TtYFGR83UzjxeWRen9V402T8aUGYsCHOmfoisV3ZSg03gAFIbLq8TnWOJ0f4cALtnSEUg==}
     dev: true
@@ -479,7 +498,6 @@ packages:
 
   /argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
-    dev: true
 
   /array-flatten@1.1.1:
     resolution: {integrity: sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==}
@@ -1184,7 +1202,6 @@ packages:
     hasBin: true
     dependencies:
       argparse: 2.0.1
-    dev: true
 
   /jsmin@1.0.1:
     resolution: {integrity: sha512-OPuL5X/bFKgVdMvEIX3hnpx3jbVpFCrEM8pKPXjFkZUqg521r41ijdyTz7vACOhW6o1neVlcLyd+wkbK5fNHRg==}

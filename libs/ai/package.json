@@ -16,6 +16,7 @@
     },
     "dependencies": {
       "amqplib": "^0.10.3",
-      "@gpt-team/db": "workspace:*"
+      "@gpt-team/db": "workspace:*",
+      "@gpt-team/phases": "workspace:*"
     }
   }
