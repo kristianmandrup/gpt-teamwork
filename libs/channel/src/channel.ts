@@ -1,4 +1,6 @@
 import * as amqp from 'amqplib';
+import { createSend } from './send';
+import { parseMsg } from './parse'
 
 export const getChannel = async (rabbitmqUrl) => {
     const connection = await amqp.connect(rabbitmqUrl);
@@ -17,10 +19,12 @@ export class MessageBus {
 
     async connect() {
         this.connection = await amqp.connect(this.url);
+        return this.connection
     }
 
     getChannel = async () => {
-        return await this.connection.createChannel();    
+        const channel = await this.connection.createChannel();    
+        return new Channel(channel)
     }    
 }
 
@@ -28,14 +32,26 @@ export class Channel {
     channel: amqp.Channel
 
     constructor(channel: amqp.Channel) {        
-        this.channel = channel;
+        this.channel = channel;        
     }
 
-    async assertExists(name: string) {
-        await this.channel.assertQueue(name);
+    getRawChannel() {
+        return this.channel
+    }
+
+    createSend(channel: any, queueName: string, sender: string) {
+        return createSend(channel, queueName, sender);
+    }
+
+    async assertExists(name: string, opts: amqp.Options.AssertQueue) {
+        await this.channel.assertQueue(name, opts);
     }   
     
     async consume(name: string, onMessage: OnMessage, options?: amqp.Options.Consume) {
         return await this.channel.consume(name, onMessage, options)
+    }
+
+    parseMsg(message: amqp.ConsumeMessage) {
+        return parseMsg(message)
     }
 }

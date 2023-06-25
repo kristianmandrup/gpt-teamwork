@@ -36,6 +36,10 @@ export class FilePhases extends FilePhaseHandler implements IPhases {
         return this.done
     }
 
+    setDone() {
+        this.done = true
+    }
+
     constructor(basePath: string) {
         super();
         this.basePath = basePath
@@ -82,17 +86,21 @@ export class FilePhases extends FilePhaseHandler implements IPhases {
 
 export class FilePhase extends FilePhaseHandler implements IPhase {
     private phaseTasks: PhaseTasks;
-    private filePath: string
+    private folderPath: string
     private phaseTasksPath: string
     private goalPath: string
     private goal: string = '';
 
-    constructor(filePath: string) {
+    constructor(folderPath: string) {
         super()
-        this.filePath = filePath;
-        this.goalPath = path.join(this.filePath, 'goal.md');
-        this.phaseTasksPath = path.join(this.filePath, 'phase-tasks');
+        this.folderPath = folderPath;
+        this.goalPath = path.join(this.folderPath, 'goal.md');
+        this.phaseTasksPath = path.join(this.folderPath, 'phase-tasks');
         this.phaseTasks = new PhaseTasks(this.phaseTasksPath);
+    }
+
+    get name(): string {
+        return path.parse(this.folderPath).name
     }
 
     async loadGoal() {        
@@ -125,7 +133,6 @@ export class PhaseTasks extends FilePhaseHandler implements IPhaseTasks {
     fileFilter(file: string) {
         return this.indexof(file) >= 0
     }
-
 
     async loadOrder() {
         const tasksOrderPath = path.join(this.tasksPath, 'task-order.yml');
@@ -173,6 +180,10 @@ export class FilePhaseTask extends FilePhaseHandler implements IPhaseTask {
 
     isDone(): boolean {
         return this.done
+    }
+
+    get name(): string {
+        return path.parse(this.folderPath).name
     }
 
     constructor(folderPath: string) {

@@ -1,5 +1,5 @@
 import { AI, runPhaseStep } from "@gpt-team/ai";
-import { queueNames, createSend } from "@gpt-team/channel";
+import { queueNames, createSend, parseMsg } from "@gpt-team/channel";
 import { ConsumeMessage } from "amqplib";
 
 export type ConsumerOpts = {
@@ -10,7 +10,7 @@ export type ConsumerOpts = {
     config?: any
 }
 
-export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) => async (message: ConsumeMessage) => {
+export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) => async (cmsg: ConsumeMessage) => {
     // OpenAI options
     const model = process.env.GPT_MODEL;
     const temperature = process.env.TEMPERATURE;
@@ -25,8 +25,11 @@ export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) 
     // const { publish } = config.channels || {};
     const { input, output } = config;
 
+    const body = await parseMsg(cmsg)
+    const inputMsg = body.message;
+
     const inputs = [
-        message.content,
+      inputMsg,
         ...input
     ]
 
@@ -35,12 +38,17 @@ export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) 
     const text = JSON.stringify(messages);
 
     // dbs.logs.setItem(step.name, text);
-    const msgList = messages.map((m: any) => m.content);
+    const msgList = messages.map((m: any) => m.content.toString());
     console.log("UI output generated:", msgList);
 
     // create method to send UI output to UI channel
+    const sendMsgs = [] 
     // TODO: make dynamic based on config.channels?
-    const sendUiMsg = createSend(channel, queueNames.ui, "ui");
+    for (var out of output) {
+      const sendUiMsg = createSend(channel, out, "ui");
+      sendMsgs.push(sendUiMsg)
+    }
+    
     const sendDeliverable = createSend(
       channel,
       queueNames.deliverables,
@@ -51,8 +59,12 @@ export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) 
       // for fs writer agent to process
       await sendDeliverable({ messages: msgList });
     }
+    
+    for (var sendUiMsg of sendMsgs) {
+      await sendUiMsg({ messages: msgList });
+    }
     // send output returned from step to UI channel
-    await sendUiMsg({ messages: msgList });
+    
   // Acknowledge the message to remove it from the queue
   channel.ack(message);
 }

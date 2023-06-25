@@ -1,6 +1,6 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const amqp = require('amqplib');
+import express from 'express';
+import bodyParser from  'body-parser'
+import * as amqp from  'amqplib'
 
 const app = express();
 app.use(bodyParser.json());
@@ -22,7 +22,12 @@ app.post('/projects', async (req: any, res: any) => {
 
     // Send the project description to the queue
     await channel.assertQueue(queueName);
-    channel.sendToQueue(queueName, Buffer.from(JSON.stringify(projectDescription)));
+    const body = {
+      message: projectDescription      
+    }
+    const msg = JSON.stringify(body)
+
+    channel.sendToQueue(queueName, Buffer.from(msg));
 
     // Close the RabbitMQ connection
     await channel.close();
