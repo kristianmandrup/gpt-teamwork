@@ -1,0 +1,12 @@
+prompts:
+  input:
+    - would you like more details?
+  channels:
+    subscribe:
+      - project
+    publish:
+      - ui    
+  output: 
+    name: use case
+    type: diagram
+    

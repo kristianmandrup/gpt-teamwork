@@ -151,6 +151,22 @@ For a UI agent this may include use case diagrams, user stories, design system d
 To load the phases and tasks use the tooling in `@gpt-team/phases` under the `libs/phases` folder.
 It currently includes some interfaces that can be implemented and simple implementations for loading phases and tasks from the file system.
 
+Each phase task is a folder (by default) which can have:
+
+- one or more text files used as AI prompts
+- `config.yaml` file with details for how to run this task
+
+The config may include
+
+- User inputs: User prompts to ask the user to feed additional information
+- Channel info: `subscribe` and `publish` channels 
+- What to output: 
+  - `type` ie. `diagram`, `code`, `documentation`, ...
+  - `format` 
+  - etc.
+
+In general, the only major step left in this design is to implement the proper step logic leveraging the phases/tasks architecture.
+
 ### Shared Libs
 
 The `libs` folder contains functionality that can be reused across agents and apps.
