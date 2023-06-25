@@ -10,10 +10,15 @@ export class FilePhaseHandler {
         const fileName = path.parse(folderPath).name
         return this.ordering.indexof(fileName)
     }
+
+    // TODO: only folders
+    fileFilter(file: string) {
+        return this.indexof(file) >= 0
+    }
         
     sortedFoldersFrom(filePath: string) {
-        const folders = fs.readdirSync(filePath);
-        const useFolders = folders.filter((f) => this.indexof(f) >= 0 );
+        const files = fs.readdirSync(filePath);
+        const useFolders = files.filter((f) => this.fileFilter(f) );
         return useFolders.sort((f1: string, f2: string) => {
             return this.indexof(f1) <= this.indexof(f2) ? 1 : 0;
         });    
@@ -38,7 +43,7 @@ export class FilePhases extends FilePhaseHandler implements IPhases {
     }
 
     async loadOrder() {
-        const phasesOrderPath = path.join(this.phasesPath, 'phase-order.yaml');
+        const phasesOrderPath = path.join(this.phasesPath, 'phase-order.yml');
         try {
             const file = fs.readFileSync(phasesOrderPath, 'utf8')
             const doc = yaml.load(file);
@@ -102,7 +107,7 @@ export class FilePhase extends FilePhaseHandler implements IPhase {
 }
 
 export class PhaseTasks extends FilePhaseHandler implements IPhaseTasks {
-    private filePath: string
+    private tasksPath: string
     private tasks: IPhaseTask[] = [];
     private currentTask?: IPhaseTask;
     private done: boolean = false;
@@ -111,15 +116,32 @@ export class PhaseTasks extends FilePhaseHandler implements IPhaseTasks {
         return this.done
     }
 
-    constructor(filePath: string) {
+    constructor(tasksPath: string) {
         super()
-        this.filePath = filePath;
+        this.tasksPath = tasksPath;
+    }
+
+    // TODO: only folders
+    fileFilter(file: string) {
+        return this.indexof(file) >= 0
+    }
+
+
+    async loadOrder() {
+        const tasksOrderPath = path.join(this.tasksPath, 'task-order.yml');
+        try {
+            const file = fs.readFileSync(tasksOrderPath, 'utf8')
+            const doc = yaml.load(file);
+            this.ordering = doc
+          } catch (e) {
+            console.log(e);
+          }        
     }
 
     async loadTasks() {
         if (this.tasks.length > 0) return;
-        const folders = fs.readdirSync(this.filePath);
-        const useFolders = folders.filter((f) => this.indexof(f) >= 0 );
+        const files = fs.readdirSync(this.tasksPath);
+        const useFolders = files.filter((f) => this.fileFilter(f) );
         const sortedFolders = useFolders.sort((f1: string, f2: string) => {
             return this.indexof(f1) <= this.indexof(f2) ? 1 : 0;
         });
@@ -162,8 +184,13 @@ export class FilePhaseTask extends FilePhaseHandler implements IPhaseTask {
         return this.config;
     }
 
+    // TODO: only txt and md files
+    fileFilter(file: string) {
+        return this.indexof(file) >= 0
+    }
+
     async loadConfig() {
-        const configPath = path.join(this.folderPath, 'config.yaml');
+        const configPath = path.join(this.folderPath, 'config.yml');
         try {
             const file = fs.readFileSync(configPath, 'utf8')
             const doc = yaml.load(file);
@@ -185,7 +212,7 @@ export class FilePhaseTask extends FilePhaseHandler implements IPhaseTask {
     async loadMessages() {
         if (this.messages.length > 0) return;
         const files = fs.readdirSync(this.folderPath);
-        const useFiles = files.filter((f) => this.indexof(f) >= 0 );
+        const useFiles = files.filter((f) => this.fileFilter(f) );
         const sortedFiles = useFiles.sort((f1: string, f2: string) => {
             return this.indexof(f1) <= this.indexof(f2) ? 1 : 0;
         });
