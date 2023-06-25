@@ -56,6 +56,10 @@ export class FilePhases extends FilePhaseHandler implements IPhases {
         this.currentPhase = this.phases.shift();
         return this.currentPhase;
     }
+
+    nextTask(): IPhaseTask | undefined {
+        return this.currentPhase?.nextTask();
+    }
 }
 
 export class FilePhase extends FilePhaseHandler implements IPhase {
@@ -73,10 +77,13 @@ export class FilePhase extends FilePhaseHandler implements IPhase {
         this.phaseTasks = new PhaseTasks(this.phaseTasksPath);
     }
 
-    async loadGoal() {
-        
+    async loadGoal() {        
         const doc = fs.readFileSync(this.goalPath, 'utf-8');
         this.goal = doc;
+    }
+
+    nextTask() {
+        return this.phaseTasks.nextTask();
     }
 }
 

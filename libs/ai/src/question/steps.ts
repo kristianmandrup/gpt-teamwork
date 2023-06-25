@@ -33,17 +33,10 @@ async function run(ai: AI, dbs: DBs) {
 }
 
 async function runPhaseStep(ai: AI, dbs: DBs, phases: IPhases) {
-  console.log('runClarified')
-  const messages = JSON.parse(dbs.logs.getItem(clarify.name));
-  console.log({messages})
-  messages[0] = ai.fsystem(setupSysPrompt(dbs));
-  const response = await ai.next(messages, dbs.identity.getItem('use_qa'));
-  const lastResponse = response[response.length - 1] || {};
-  if (!lastResponse) return response
-  await toFiles(dbs.workspace, lastResponse.content);
-  return response;
+  console.log('run phase step')
+  const message = phases.nextTask();
+  // TODO: ...
 }
-
 
 async function clarify(ai: AI, dbs: DBs) {
   console.log('clarify')

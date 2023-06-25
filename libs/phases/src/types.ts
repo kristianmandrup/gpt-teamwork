@@ -1,10 +1,12 @@
 export interface IPhases {
     loadPhases(): Promise<void>
     nextPhase(): IPhase | undefined
+    nextTask(): IPhaseTask | undefined; 
 }
 
 export interface IPhase {
     loadGoal(): Promise<void>
+    nextTask(): IPhaseTask | undefined; 
 }
 
 export interface IPhaseTasks {

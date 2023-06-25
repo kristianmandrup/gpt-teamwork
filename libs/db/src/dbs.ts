@@ -1,6 +1,7 @@
 export interface DB {  
     getItem(key: string): string;
     setItem(key: string, val: string): void;
+    clear(key: string): void
 }
 
 export interface DBs {
@@ -9,4 +10,5 @@ export interface DBs {
     identity: DB;
     input: DB;
     workspace: DB;
+    clear?: (key: string) => void
 }

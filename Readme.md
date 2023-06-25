@@ -55,6 +55,10 @@ The workspaces are:
 
 See [Setup a monorepo with pnpm & add Nx for speed](https://blog.nrwl.io/setup-a-monorepo-with-pnpm-workspaces-and-speed-it-up-with-nx-bc5d97258a7e)
 
+Run a npm command on a single workspace
+
+`pnpm run --filter @gpt-team/phases build`
+
 Build all packages in the workspace
 
 `pnpm run -r build`
