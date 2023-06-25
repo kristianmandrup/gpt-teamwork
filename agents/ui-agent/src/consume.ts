@@ -1,4 +1,5 @@
 import { AI, runPhaseStep } from "@gpt-team/ai";
+import type { OutputOpts } from "@gpt-team/ai";
 import { queueNames, createSend, parseMsg } from "@gpt-team/channel";
 import { ConsumeMessage } from "amqplib";
 
@@ -22,8 +23,9 @@ export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) 
       });
       
     // TODO: use task config
-    // const { publish } = config.channels || {};
-    const { input, output } = config;
+    const { publish } = config.channels || {};
+    const { input } = config;
+    const output: OutputOpts = config.output
 
     const body = await parseMsg(cmsg)
     const inputMsg = body.message;
@@ -34,7 +36,7 @@ export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) 
     ]
 
     // TODO: send msgContent as initial input?
-    const messages = await runPhaseStep({ai, dbs, inputs, task});
+    const messages = await runPhaseStep({ai, dbs, inputs, output, task});
     const text = JSON.stringify(messages);
 
     // dbs.logs.setItem(step.name, text);
@@ -44,8 +46,8 @@ export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) 
     // create method to send UI output to UI channel
     const sendMsgs = [] 
     // TODO: make dynamic based on config.channels?
-    for (var out of output) {
-      const sendUiMsg = createSend(channel, out, "ui");
+    for (var pub of publish) {
+      const sendUiMsg = createSend(channel, pub, "ui");
       sendMsgs.push(sendUiMsg)
     }
     
@@ -66,5 +68,5 @@ export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) 
     // send output returned from step to UI channel
     
   // Acknowledge the message to remove it from the queue
-  channel.ack(message);
+  channel.ack(body);
 }

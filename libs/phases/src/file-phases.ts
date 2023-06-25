@@ -90,6 +90,15 @@ export class FilePhase extends FilePhaseHandler implements IPhase {
     private phaseTasksPath: string
     private goalPath: string
     private goal: string = '';
+    private done: boolean = false;
+
+    isDone(): boolean {
+        return this.done
+    }
+
+    setDone(): void {
+        this.done = true
+    }
 
     constructor(folderPath: string) {
         super()
@@ -109,7 +118,11 @@ export class FilePhase extends FilePhaseHandler implements IPhase {
         this.goal = doc;
     }
 
-    nextTask() {
+    async nextTask() {        
+        if (this.phaseTasks.isDone()) {
+            this.done = true;
+            return
+        }
         return this.phaseTasks.nextTask();
     }
 }

@@ -8,6 +8,12 @@ import path from "path";
 
 const rabbitmqUrl = "amqp://localhost";
 
+const terminationMsgs = ['COMPLETED', 'TERMINATED']
+
+const isUiDone = ({ body }: any) => {
+  return terminationMsgs.includes(body.message) && body.sender == 'ui'
+}
+
 // Function to process project descriptions and generate use cases
 export async function processPhases() {
   // Db
@@ -29,19 +35,8 @@ export async function processPhases() {
     const phases = new FilePhases(phasesPath);
     let phase: IPhase
 
-    const isPhaseDone = ({body, phase }: any) => {
-      return body.message == 'DONE' && body.phase === phase.name && body.sender == 'ui'
-    }
-
-    const isUiDone = ({body, phase }: any) => {
-      return body.message == 'UI DONE' && body.sender == 'ui'
-    }
-
     channel.consume('status', async (cmsg: ConsumeMessage) => {
-      const body = await channel.parse(cmsg)
-      if (isPhaseDone({body, phase})) {
-        phase = await phases.nextPhase()
-      }
+      const body = await channel.parseMsg(cmsg)
 
       if (isUiDone({body, phase })) {
         phases.setDone()
@@ -49,10 +44,13 @@ export async function processPhases() {
     })
 
     const chn = channel.getRawChannel()
+    phase = await phases.nextPhase();
 
     while (!phases.isDone()) {
-      phase = await phases.nextPhase();
       const task = await phases.nextTask();
+      if (phase.isDone()) {
+        phase = await phases.nextPhase();
+      }
       // from config.yaml in task folder
       const config = await task.getConfig();
       const { subscribe } = config.channels || {};

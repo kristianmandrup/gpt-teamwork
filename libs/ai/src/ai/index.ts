@@ -5,6 +5,12 @@ const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+export type NextOpts = {
+  messages: ChatCompletionRequestMessage[]
+  prompt?: string
+  output?: any
+}
+
 export class AI {
   private client: any;
   private kwargs: Record<string, any>;
@@ -21,7 +27,7 @@ export class AI {
       { role: "user", content: user },
     ];
 
-    return this.next(messages);
+    return this.next({messages});
   }
 
   public fsystem(msg: string): ChatCompletionRequestMessage {
@@ -32,7 +38,8 @@ export class AI {
     return { role: "user", content: msg };
   }
 
-  public async next(messages: ChatCompletionRequestMessage[], prompt?: string): Promise<ChatCompletionRequestMessage[]> {
+  public async next({messages, prompt, output}: NextOpts): Promise<ChatCompletionRequestMessage[]> {
+    // TODO: use output if present
     if (prompt) {
       messages = messages.concat([{ role: "user", content: prompt }]);
     }

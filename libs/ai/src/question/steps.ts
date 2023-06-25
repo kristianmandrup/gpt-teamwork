@@ -1,7 +1,7 @@
 import { AI}  from '../ai';
 import { toFiles } from '../response-parser';
 import { DBs } from '@gpt-team/db'
-import { IPhaseTask, IPhases } from '@gpt-team/phases'
+import { IPhaseTask } from '@gpt-team/phases'
 
 const readline = require('readline');
 
@@ -33,15 +33,23 @@ async function run(ai: AI, dbs: DBs) {
   return messages;
 }
 
+export type OutputOpts = {
+  name: string
+  type: string
+  language?: string
+  ext?: string
+}
+
 export type PhaseStepOpts = {
   ai: AI
   dbs: DBs
   task: IPhaseTask
+  output?: OutputOpts
   inputs?: string[]
   config?: any
 }
 
-export async function runPhaseStep({ai, dbs, task, inputs, config}: PhaseStepOpts) {
+export async function runPhaseStep({ai, dbs, task, inputs, output, config}: PhaseStepOpts) {
   console.log('run phase step')
   // TODO: use inputs and config
   await task.loadMessages();
@@ -52,7 +60,8 @@ export async function runPhaseStep({ai, dbs, task, inputs, config}: PhaseStepOpt
   let user: any = dbs.input.getItem('ui_user');
   // TODO: ...
   while (true) {
-    const response = await ai.next(messages, user);
+    // use output name and type
+    const response = await ai.next({messages, prompt: user, output});
     const lastMessage = response[response.length - 1] || {};
     const content = lastMessage.content;
     // TODO: refactor/extract and make generic/configurable
@@ -72,58 +81,3 @@ export async function runPhaseStep({ai, dbs, task, inputs, config}: PhaseStepOpt
   }
   return messages;
 }
-
-async function clarify(ai: AI, dbs: DBs) {
-  console.log('clarify')
-  const qa = dbs.identity.getItem('qa')
-  console.log({qa})
-  const qaMsgs = ai.fsystem(qa);
-  console.log({qaMsgs})
-  const messages = [qaMsgs];
-  console.log({messages})
-  let user: any = dbs.input.getItem('main_prompt');
-  console.log({user})
-  while (true) {
-    const response = await ai.next(messages, user);
-    console.log({response})
-    const lastMessage = response[response.length - 1] || {};
-    const content = lastMessage.content;
-    const possibleCommand = content ? content.trim().toLowerCase() : ''
-    if (!content || possibleCommand === 'no') {
-      break;
-    }
-    console.log('clarify');
-    
-    user = await question('(answer in text, or "q" to move on)\n');
-    console.log(`User input: ${user}`);  
-    //user = prompt('(answer in text, or "q" to move on)\n');
-    //console.log();
-    if (!user || user === 'q') {
-      break;
-    }
-    user += '\n\n' + 'Is anything else unclear? If yes, only answer in the form:\n' + '{remaining unclear areas} remaining questions.\n' + '{Next question}\n' + 'If everything is sufficiently clear, only answer "no".';
-    messages.push({ role: 'user', content: user });
-  }
-  console.log();
-  return messages;
-}
-
-async function runClarified(ai: AI, dbs: DBs) {
-  console.log('runClarified')
-  const messages = JSON.parse(dbs.logs.getItem(clarify.name));
-  console.log({messages})
-  messages[0] = ai.fsystem(setupSysPrompt(dbs));
-  const response = await ai.next(messages, dbs.identity.getItem('use_qa'));
-  const lastResponse = response[response.length - 1] || {};
-  if (!lastResponse) return response
-  await toFiles(dbs.workspace, lastResponse.content);
-  return response;
-}
-
-export const STEPS = {clarify, runClarified};
-
-// Future steps that can be added:
-// improveFiles,
-// addTests
-// runTestsAndFixFiles,
-// improveBasedOnInFileFeedbackComments

@@ -8,6 +8,8 @@ export interface IPhases {
 
 export interface IPhase {
     name: string
+    isDone(): boolean
+    setDone(): void
     loadGoal(): Promise<void>
     nextTask(): Promise<IPhaseTask | undefined>
 }
