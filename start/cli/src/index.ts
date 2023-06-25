@@ -1,14 +1,18 @@
-const axios = require('axios');
+import axios from 'axios';
+import psp from "prompt-sync";
+const prompt = psp({ sigint: true });
+const title = prompt("What is the title of your project?");
+const description = prompt("Describe your project?");
 
 const projectDescription = {
-  title: 'Sample Project',
-  description: 'This is a sample project description',
+  title,
+  description,
   // Add more fields as needed
 };
 
 axios
   .post('http://localhost:3000/projects', projectDescription)
-  .then((response) => {
+  .then((_) => {
     console.log('Project description sent successfully');
   })
   .catch((error) => {

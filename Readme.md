@@ -8,31 +8,64 @@ The apps and agents are started using [PM2](https://pm2.keymetrics.io/docs/usage
 
 The agents and apps to start is configured in the `ecosystem.config.js` file in the project root.
 
-To start the project simply run:
+Install
+
+`pnpm run -r install`
+
+Build
+
+`pnpm run -r build`
+
+To start the project (web server and all agents) simply run:
 
 `pm2 start ecosystem.config.js`
 
-To send the first message to kick things off:
+To interact with the system and kick things off:
 
-`node start`
-
-The `start` folder currently includes a small script to kick things off. It posts a message to the endpoint with the project description to be processed.
-
-TODO: Ask the user for input and send that input
+`node start/cli`
 
 ## Project Design
 
 This project is designed as a PNPM workspace.
 
+See [Managing a full-stack, multipackage monorepo using pnpm](https://blog.logrocket.com/managing-full-stack-monorepo-pnpm/)
+
 ## Workspaces
 
 The workspaces are:
 
-`agents`
-`apps`
-`libs`
+- `agents`
+- `apps`
+- `libs`
+- `start`
 
 See [Setup a monorepo with pnpm & add Nx for speed](https://blog.nrwl.io/setup-a-monorepo-with-pnpm-workspaces-and-speed-it-up-with-nx-bc5d97258a7e)
+
+Build all packages in the workspace
+
+`pnpm run -r build`
+
+You can parallelize the run by using `--parallel`
+
+Add a package to the ai workspace
+
+`pnpm add --filter ai openai`
+
+### Run commands with Nx
+
+Build `ai` workspace
+
+`npx nx build ai`
+
+Build all
+
+`npx nx run-many --target=build --all`
+
+### Start
+
+The `start` folder will include various ways to start/intertact with the system.
+
+Currently `start` includes a `cli` project which lets you input the title and description for a project which is sent to the server projects endpoint via a `POST` request (axios).
 
 ### Apps
 

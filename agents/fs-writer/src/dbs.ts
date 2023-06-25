@@ -1,4 +1,4 @@
-import { FileDB } from '../../libs/db';
+import { FileDB } from '@gpt-team/db';
 import path from 'path';
 
 export const createDbs =(basePath: string = process.cwd()) => {

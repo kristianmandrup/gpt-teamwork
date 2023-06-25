@@ -2,9 +2,17 @@
     "name": "@gpt-team/ai",
     "private": true,
     "sideEffects": false,
+    "keywords": [
+      "AI",
+      "LLM",
+      "tooling"
+    ],
+    "author": "",
+    "license": "ISC",    
     "main": "dist/index.js",
     "scripts": {
-      "build": "rm -rf dist && tsc"
+      "build": "rm -rf dist && tsc",
+      "install": "pnpm install"
     },
     "dependencies": {
       "amqplib": "^0.10.3",

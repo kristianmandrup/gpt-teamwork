@@ -1,6 +1,6 @@
 import { AI}  from '../ai';
 import { toFiles } from '../response-parser';
-import { DBs } from '../../db/src/dbs';
+import { DBs } from '@gpt-team/db'
 
 const readline = require('readline');
 

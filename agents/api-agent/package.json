@@ -4,12 +4,14 @@
     "sideEffects": false,
     "main": "dist/index.js",
     "scripts": {
-      "build": "rm -rf dist && tsc"
+      "build": "rm -rf dist && tsc",
+      "install": "pnpm install"
     },
     "dependencies": {
       "amqplib": "^0.10.3",
       "@gpt-team/channel": "workspace:*",
-      "@gpt-team/ai": "workspace:*"
+      "@gpt-team/ai": "workspace:*",
+      "@gpt-team/db": "workspace:*"      
     },
     "devDependencies": {
       "@types/amqplib": "^0.10.1"
