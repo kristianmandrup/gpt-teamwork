@@ -1,27 +1,25 @@
-export interface IPhases {
-    loadPhases(): Promise<void>
-    nextPhase(): Promise<void>
-}
+import type { IPhase } from './types'
+import path from 'path'
+import fs from 'fs'
 
-export class Phases {
-    private phases: Phase[] = [];
+export class FilePhases {
+    private phases: IPhase[] = [];
+    private basePath: string
 
-    constructor() {
+    constructor(basePath: string) {
+        this.basePath = basePath
     }
 
     async loadPhases() {
+        const phasesPath = path.join(this.basePath, 'phases');
+        fs.readdirSync(phasesPath);
+        // TODO
     }
 
     async nextPhase() {
 
     }
 }
-
-export interface IPhase {
-    loadPhaseTasks(): Promise<void>
-    nextPhaseTask(): Promise<void>
-}
-
 
 export class Phase {
     private phaseTasks: PhaseTasks;
@@ -37,11 +35,6 @@ export class Phase {
     }
 }
 
-export interface IPhaseTasks {
-    loadTasks(): Promise<void>
-    nextTask(): Promise<void>
-}
-
 export class PhaseTasks {
     private tasks: PhaseTask[] = [];
 
@@ -51,11 +44,6 @@ export class PhaseTasks {
     async nextTask() {
         
     }
-}
-
-export interface IPhaseTask {
-    loadPrompts(): Promise<void>
-    nextPrompt(): Promise<void>
 }
 
 export class PhaseTask {
