@@ -32,7 +32,7 @@ async function processProjectDescriptions() {
 
     // Consume messages from the queue
     channel.consume(queueNames.project, async (message: any) => {
-      const projectDescription = JSON.parse(message.content.toString());
+      const msgContent = JSON.parse(message.content.toString());
 
       // TODO: Use the project description to generate basic UI using the OpenAI API
       const ai = new AI({
@@ -46,6 +46,8 @@ async function processProjectDescriptions() {
 
       const promises = Object.keys(STEPS).map(async (key) => {
         const step: any = (STEPS as any)[key];
+        // TODO: send msg consumed from channel instead!
+        // msgContent
         const messages = await step(ai, dbs);
         const text = JSON.stringify(messages)
         dbs.logs.setItem(step.name, text);

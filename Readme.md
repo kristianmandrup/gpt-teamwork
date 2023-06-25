@@ -144,6 +144,8 @@ If tasks can be performed in parallel you can put several task names for an item
 The agent will process tasks in phase and task order to eventually create deliverables. 
 For a UI agent this may include use case diagrams, user stories, design system description and UI/UX code etc.
 
+To load the phases and tasks, some basic interfaces and place-holder functionality are included in `@gpt-team/phases` under the `libs/phases` folder.
+
 ### Shared Libs
 
 The `libs` folder contains functionality that can be reused across agents and apps.
