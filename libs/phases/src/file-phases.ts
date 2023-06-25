@@ -49,7 +49,7 @@ export class FilePhases extends FilePhaseHandler implements IPhases {
     }
 
     async loadPhases() {                
-        // load in order
+        if (this.phases.length > 0) return;
         const sortedFolders = this.sortedFoldersFrom(this.phasesPath)
         for (const folderPath of sortedFolders) {
             const phase = new FilePhase(folderPath)
@@ -58,6 +58,7 @@ export class FilePhases extends FilePhaseHandler implements IPhases {
     }
 
     async nextPhase() {
+        await this.loadPhases();
         this.currentPhase = this.phases.shift();
         if (!this.currentPhase) {
             this.done = true;
@@ -90,6 +91,7 @@ export class FilePhase extends FilePhaseHandler implements IPhase {
     }
 
     async loadGoal() {        
+        if (this.goal) return;
         const doc = fs.readFileSync(this.goalPath, 'utf-8');
         this.goal = doc;
     }
@@ -115,7 +117,7 @@ export class PhaseTasks extends FilePhaseHandler implements IPhaseTasks {
     }
 
     async loadTasks() {
-        // TODO: load order
+        if (this.tasks.length > 0) return;
         const folders = fs.readdirSync(this.filePath);
         const useFolders = folders.filter((f) => this.indexof(f) >= 0 );
         const sortedFolders = useFolders.sort((f1: string, f2: string) => {
@@ -140,20 +142,66 @@ export class PhaseTasks extends FilePhaseHandler implements IPhaseTasks {
     }
 }
 
-export class FilePhaseTask implements IPhaseTask {
-    private filePath: string
-    private file: string = '';
-    // private prompts: string[] = [];
+// such as use-cases
+export class FilePhaseTask extends FilePhaseHandler implements IPhaseTask {
+    private folderPath: string
+    private messages: string[] = [];
+    private config: any;
+    private done: boolean = false;
 
-    constructor(filePath: string) {
-        this.filePath = filePath;
+    isDone(): boolean {
+        return this.done
     }
 
-    async loadPrompts() {
-        this.file = fs.readFileSync(this.filePath, 'utf8')
+    constructor(folderPath: string) {
+        super();
+        this.folderPath = folderPath;
     }
 
-    async nextPrompt() {
-        return this.file;
+    getConfig() {
+        return this.config;
+    }
+
+    async loadConfig() {
+        const configPath = path.join(this.folderPath, 'config.yaml');
+        try {
+            const file = fs.readFileSync(configPath, 'utf8')
+            const doc = yaml.load(file);
+            this.config = doc
+          } catch (e) {
+            console.log(e);
+          }        
+    }
+
+    async loadMsgFile(filePath: string) {
+        const fullFilePath = path.join(this.folderPath, filePath);
+        try {
+            return fs.readFileSync(fullFilePath, 'utf8');
+        } catch (e) {
+            console.log(e);
+        }        
+    }
+
+    async loadMessages() {
+        if (this.messages.length > 0) return;
+        const files = fs.readdirSync(this.folderPath);
+        const useFiles = files.filter((f) => this.indexof(f) >= 0 );
+        const sortedFiles = useFiles.sort((f1: string, f2: string) => {
+            return this.indexof(f1) <= this.indexof(f2) ? 1 : 0;
+        });
+        for (const filePath of sortedFiles) {
+            const message = await this.loadMsgFile(filePath)
+            if (!message) continue;
+            this.messages.push(message)
+        }        
+    }
+
+    async nextMessage() {
+        await this.loadMessages();
+        const msg = this.messages.shift();
+        if (!msg) {
+            this.done = true;
+        }
+        return msg;
     }
 }

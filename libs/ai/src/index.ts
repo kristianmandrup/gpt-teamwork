@@ -1,3 +1,3 @@
 export { AI } from './ai';
-export { STEPS } from './question'
+export { STEPS, runPhaseStep } from './question'
 export { parseChat, toFiles } from './response-parser'

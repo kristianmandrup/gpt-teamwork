@@ -16,7 +16,8 @@ export interface IPhaseTasks {
 
 
 export interface IPhaseTask {
-    loadPrompts(): Promise<void>
-    nextPrompt(): Promise<string>
+    loadMessages(): Promise<void>
+    nextMessage(): Promise<string | undefined>
+    getConfig(): any;
 }
 

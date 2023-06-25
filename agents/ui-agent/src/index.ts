@@ -1,25 +1,25 @@
-import * as amqp from 'amqplib';
-import { AI, STEPS } from '@gpt-team/ai'
-import { queueNames, createSend } from '@gpt-team/channel'
-import { FilePhases } from '@gpt-team/phases';
-import { createDbs } from './dbs';
+import * as amqp from "amqplib";
+import { AI, runPhaseStep } from "@gpt-team/ai";
+import { queueNames, createSend } from "@gpt-team/channel";
+import { FilePhases } from "@gpt-team/phases";
+import { createDbs } from "./dbs";
 
-import path from 'path';
+import path from "path";
 
 // Function to process project descriptions and generate use cases
-async function processProjectDescriptions() {
+async function processMsgs() {
   // Db
-  const basePath = path.join(process.cwd(), 'agents', 'ui-agent', 'db');
-  const dbs = createDbs(basePath)
+  const basePath = path.join(process.cwd(), "agents", "ui-agent", "db");
+  const dbs = createDbs(basePath);
 
   // RabbitMQ connection URL
-  const rabbitmqUrl = 'amqp://localhost';
-  
+  const rabbitmqUrl = "amqp://localhost";
+
   // OpenAI options
   const model = process.env.GPT_MODEL;
   const temperature = process.env.TEMPERATURE;
-  
-  // Create an instance of the OpenAI API client  
+
+  // Create an instance of the OpenAI API client
   // Define the queue name
   try {
     // Connect to RabbitMQ
@@ -29,9 +29,9 @@ async function processProjectDescriptions() {
     // Ensure the queue exists
     await channel.assertQueue(queueNames.project);
 
-    console.log('Agent is waiting for project descriptions...');
+    console.log("Agent is waiting for project descriptions...");
 
-    const phasesPath = path.join(basePath, 'phases');
+    const phasesPath = path.join(basePath, "phases");
     const phases = new FilePhases(phasesPath);
     // TODO: start sub-agent (subscriber for each active phase ...)
 
@@ -45,29 +45,38 @@ async function processProjectDescriptions() {
         temperature,
       });
 
-      // create method to send UI output to UI channel
-      const sendUiMsg = createSend(channel, queueNames.ui, 'ui')
-      const sendDeliverable = createSend(channel, queueNames.deliverables, 'ui')  
+      while (!phases.isDone()) {
+        phases.nextPhase();
+        const task = await phases.nextTask();
+        // from config.yaml in task folder
+        const config = task.getConfig();
+        const { subscribe, publish } = config.channels || {};
+        const { input, output } = config;
 
-      const promises = Object.keys(STEPS).map(async (key) => {
-        const step: any = (STEPS as any)[key];
-        // TODO: send msg consumed from channel instead!
-        // msgContent
-        const messages = await runPhaseStep(ai, dbs, phases);
-        const text = JSON.stringify(messages)
-        dbs.logs.setItem(step.name, text);
-        
+        // TODO: send msgContent as initial input?
+        const messages = await runPhaseStep(ai, dbs, task);
+        const text = JSON.stringify(messages);
+
+        // dbs.logs.setItem(step.name, text);
         const msgList = messages.map((m: any) => message.content);
-        console.log('UI output generated:', msgList);        
+        console.log("UI output generated:", msgList);
+
+        // create method to send UI output to UI channel
+        // TODO: make dynamic based on config.channels?
+        const sendUiMsg = createSend(channel, queueNames.ui, "ui");
+        const sendDeliverable = createSend(
+          channel,
+          queueNames.deliverables,
+          "ui"
+        );
 
         if (text.match(/-DELIVERABLE-/)) {
           // for fs writer agent to process
-          await sendDeliverable({messages: msgList})
+          await sendDeliverable({ messages: msgList });
         }
         // send output returned from step to UI channel
-        await sendUiMsg({messages: msgList});
-      });
-      await Promise.all(promises);
+        await sendUiMsg({ messages: msgList });
+      }
       // Acknowledge the message to remove it from the queue
       channel.ack(message);
     });
@@ -76,9 +85,9 @@ async function processProjectDescriptions() {
     await channel.close();
     await connection.close();
   } catch (error) {
-    console.error('Error occurred:', error);
+    console.error("Error occurred:", error);
   }
 }
 
 // Start processing project descriptions
-processProjectDescriptions();
+processMsgs();

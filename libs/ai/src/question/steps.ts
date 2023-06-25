@@ -1,7 +1,7 @@
 import { AI}  from '../ai';
 import { toFiles } from '../response-parser';
 import { DBs } from '@gpt-team/db'
-import { IPhases } from '@gpt-team/phases'
+import { IPhaseTask, IPhases } from '@gpt-team/phases'
 
 const readline = require('readline');
 
@@ -33,11 +33,10 @@ async function run(ai: AI, dbs: DBs) {
   return messages;
 }
 
-export async function runPhaseStep(ai: AI, dbs: DBs, phases: IPhases) {
+export async function runPhaseStep(ai: AI, dbs: DBs, task: IPhaseTask) {
   console.log('run phase step')
-  const task = await phases.nextTask();
-  await task?.loadPrompts();
-  const message = await task?.nextPrompt();
+  await task?.loadMessages();
+  const message = await task?.nextMessage();
   if (!message) return
   const chatMsg = ai.fsystem(message);
   const messages = [chatMsg];  
