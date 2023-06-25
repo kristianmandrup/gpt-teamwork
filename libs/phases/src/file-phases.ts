@@ -25,6 +25,11 @@ export class FilePhases extends FilePhaseHandler implements IPhases {
     private currentPhase?: IPhase;
     private basePath: string
     private phasesPath: string
+    private done: boolean = false;
+
+    isDone(): boolean {
+        return this.done
+    }
 
     constructor(basePath: string) {
         super();
@@ -52,12 +57,19 @@ export class FilePhases extends FilePhaseHandler implements IPhases {
         }        
     }
 
-    nextPhase(): IPhase | undefined {
+    async nextPhase() {
         this.currentPhase = this.phases.shift();
+        if (!this.currentPhase) {
+            this.done = true;
+        }
         return this.currentPhase;
     }
 
-    nextTask(): IPhaseTask | undefined {
+    async nextTask() {
+        if (this.isDone()) return
+        if (!this.currentPhase) {
+            this.nextPhase();
+        }
         return this.currentPhase?.nextTask();
     }
 }
@@ -91,6 +103,11 @@ export class PhaseTasks extends FilePhaseHandler implements IPhaseTasks {
     private filePath: string
     private tasks: IPhaseTask[] = [];
     private currentTask?: IPhaseTask;
+    private done: boolean = false;
+
+    isDone(): boolean {
+        return this.done
+    }
 
     constructor(filePath: string) {
         super()
@@ -110,8 +127,15 @@ export class PhaseTasks extends FilePhaseHandler implements IPhaseTasks {
         }        
     }
 
-    nextTask(): IPhaseTask | undefined {
+    async nextTask() {
+        if (this.isDone()) return
+        if (!this.tasks || this.tasks.length == 0) {
+            this.loadTasks();
+        }
         this.currentTask = this.tasks.shift();
+        if (!this.currentTask) {
+            this.done = true;
+        }
         return this.currentTask;        
     }
 }
@@ -129,7 +153,7 @@ export class FilePhaseTask implements IPhaseTask {
         this.file = fs.readFileSync(this.filePath, 'utf8')
     }
 
-    nextPrompt(): string {
+    async nextPrompt() {
         return this.file;
     }
 }

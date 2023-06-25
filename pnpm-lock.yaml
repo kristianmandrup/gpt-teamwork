@@ -82,6 +82,9 @@ importers:
       '@gpt-team/db':
         specifier: workspace:*
         version: link:../../libs/db
+      '@gpt-team/phases':
+        specifier: workspace:*
+        version: link:../../libs/phases
       amqplib:
         specifier: ^0.10.3
         version: 0.10.3

@@ -5,6 +5,7 @@ import { IPhases } from '@gpt-team/phases'
 
 const readline = require('readline');
 
+// TODO: use prompt-sync library?
 function question(prompt: string): Promise<string> {
   const rl = readline.createInterface({
     input: process.stdin,
@@ -32,10 +33,35 @@ async function run(ai: AI, dbs: DBs) {
   return messages;
 }
 
-async function runPhaseStep(ai: AI, dbs: DBs, phases: IPhases) {
+export async function runPhaseStep(ai: AI, dbs: DBs, phases: IPhases) {
   console.log('run phase step')
-  const message = phases.nextTask();
+  const task = await phases.nextTask();
+  await task?.loadPrompts();
+  const message = await task?.nextPrompt();
+  if (!message) return
+  const chatMsg = ai.fsystem(message);
+  const messages = [chatMsg];  
+  let user: any = dbs.input.getItem('ui_user');
   // TODO: ...
+  while (true) {
+    const response = await ai.next(messages, user);
+    const lastMessage = response[response.length - 1] || {};
+    const content = lastMessage.content;
+    const possibleCommand = content ? content.trim().toLowerCase() : ''
+    if (!content || possibleCommand === 'no') {
+      break;
+    }
+    user = await question('(answer in text, or "q" to move on)\n');
+    console.log(`User input: ${user}`);  
+    //user = prompt('(answer in text, or "q" to move on)\n');
+    //console.log();
+    if (!user || user === 'q') {
+      break;
+    }
+    user += '\n\n' + 'Is anything else unclear? If yes, only answer in the form:\n' + '{remaining unclear areas} remaining questions.\n' + '{Next question}\n' + 'If everything is sufficiently clear, only answer "no".';
+    messages.push({ role: 'user', content: user });
+  }
+  return messages;
 }
 
 async function clarify(ai: AI, dbs: DBs) {

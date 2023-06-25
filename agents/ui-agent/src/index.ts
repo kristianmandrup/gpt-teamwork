@@ -1,6 +1,7 @@
 import * as amqp from 'amqplib';
 import { AI, STEPS } from '@gpt-team/ai'
 import { queueNames, createSend } from '@gpt-team/channel'
+import { FilePhases } from '@gpt-team/phases';
 import { createDbs } from './dbs';
 
 import path from 'path';
@@ -30,6 +31,10 @@ async function processProjectDescriptions() {
 
     console.log('Agent is waiting for project descriptions...');
 
+    const phasesPath = path.join(basePath, 'phases');
+    const phases = new FilePhases(phasesPath);
+    // TODO: start sub-agent (subscriber for each active phase ...)
+
     // Consume messages from the queue
     channel.consume(queueNames.project, async (message: any) => {
       const msgContent = JSON.parse(message.content.toString());
@@ -48,7 +53,7 @@ async function processProjectDescriptions() {
         const step: any = (STEPS as any)[key];
         // TODO: send msg consumed from channel instead!
         // msgContent
-        const messages = await step(ai, dbs);
+        const messages = await runPhaseStep(ai, dbs, phases);
         const text = JSON.stringify(messages)
         dbs.logs.setItem(step.name, text);
         
