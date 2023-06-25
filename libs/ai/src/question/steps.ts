@@ -33,10 +33,19 @@ async function run(ai: AI, dbs: DBs) {
   return messages;
 }
 
-export async function runPhaseStep(ai: AI, dbs: DBs, task: IPhaseTask) {
+export type PhaseStepOpts = {
+  ai: AI
+  dbs: DBs
+  task: IPhaseTask
+  inputs?: string[]
+  config?: any
+}
+
+export async function runPhaseStep({ai, dbs, task, inputs, config}: PhaseStepOpts) {
   console.log('run phase step')
-  await task?.loadMessages();
-  const message = await task?.nextMessage();
+  // TODO: use inputs and config
+  await task.loadMessages();
+  const message = await task.nextMessage();
   if (!message) return
   const chatMsg = ai.fsystem(message);
   const messages = [chatMsg];  
@@ -46,6 +55,7 @@ export async function runPhaseStep(ai: AI, dbs: DBs, task: IPhaseTask) {
     const response = await ai.next(messages, user);
     const lastMessage = response[response.length - 1] || {};
     const content = lastMessage.content;
+    // TODO: refactor/extract and make generic/configurable
     const possibleCommand = content ? content.trim().toLowerCase() : ''
     if (!content || possibleCommand === 'no') {
       break;

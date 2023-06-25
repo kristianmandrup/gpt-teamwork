@@ -180,7 +180,8 @@ export class FilePhaseTask extends FilePhaseHandler implements IPhaseTask {
         this.folderPath = folderPath;
     }
 
-    getConfig() {
+    async getConfig() {
+        await this.loadConfig();
         return this.config;
     }
 
@@ -190,6 +191,7 @@ export class FilePhaseTask extends FilePhaseHandler implements IPhaseTask {
     }
 
     async loadConfig() {
+        if (this.config) return
         const configPath = path.join(this.folderPath, 'config.yml');
         try {
             const file = fs.readFileSync(configPath, 'utf8')

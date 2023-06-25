@@ -18,6 +18,6 @@ export interface IPhaseTasks {
 export interface IPhaseTask {
     loadMessages(): Promise<void>
     nextMessage(): Promise<string | undefined>
-    getConfig(): any;
+    getConfig(): Promise<any>;
 }
 
