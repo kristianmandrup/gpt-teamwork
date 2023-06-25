@@ -1,0 +1,23 @@
+The original plan and vision are elaborated into a software design document (SDD) that includes the system design, programming language, templates, platform to use, and application security measures. This is also where you can flowchart how the software responds to user actions.
+
+In most cases, the design phase will include the development of a prototype model. Creating a pre-production version of the product can give the team the opportunity to visualize what the product will look like and make changes without having to go through the hassle of rewriting code.
+
+After understanding the users’ wants, needs, and expectations from a product, we are ready to design.
+
+When designing a product, never forget the WHY, why are you even designing the product and why will people even use it. Make sure the why is very clear and you can even document it.
+
+The design phase includes:-
+Sketching: Sketching is the easiest and fastest way of visualizing our ideas. This can be done by hand on a piece of paper, on a whiteboard, or in a digital tool. This helps in brainstorming.
+
+Creating Wireframes: Wireframe helps designers visualize the basic structure of a future page, including the key elements and how they fit together. It acts as a backbone of the product, and designers often use them as foundations of mock-ups and prototypes. They rarely contain color, images, or styling as it is there to establish the relationship among different templates of a website/product.
+
+Creating Prototypes: While wireframes are mostly about structure and the look, prototypes are about the actual interaction experience (the look and feel). A prototype is like a simulation of the product and maybe low-fidelity (clickable wireframes) to high-fidelity (coded prototypes).
+While wireframes are mostly about structure and visual hierarchy (the look), prototypes are about the actual interaction experience (the look and feel). A prototype is like a simulation of the product and maybe low-fidelity (clickable wireframes) to high-fidelity (coded prototypes).
+
+Creating a design specification. Design specifications contain all of the visual design assets required for developers to turn prototypes into working products.
+
+- Wireframe
+- Prototype
+- Inspiration
+- Design system
+- Mockup

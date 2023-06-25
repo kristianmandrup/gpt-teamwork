@@ -1,0 +1,30 @@
+The original plan and vision are elaborated into a software design document (SDD) that 
+includes the system design, programming language, templates, platform to use, 
+and application security measures. 
+
+This is also where you can flowchart how the software responds to user actions.
+
+In most cases, the design phase will include the development of a prototype model. 
+C
+reating a pre-production version of the product can give the team the opportunity to 
+visualize what the product will look like and make changes without having to go 
+through the hassle of rewriting code.
+
+The design stage is a necessary precursor to the main developer stage.
+
+Developers will first outline the details for the overall application, alongside specific aspects, 
+such as its:
+
+User interfaces
+System interfaces
+Network and network requirements
+Databases
+
+They’ll typically turn the SRS document they created into a more logical structure that can 
+later be implemented in a programming language. 
+
+Operation, training, and maintenance plans will all be drawn up so that developers know what 
+they need to do throughout every stage of the cycle moving forward.
+
+Once complete, development managers will prepare a design document to be referenced 
+throughout the next phases of the SDLC.

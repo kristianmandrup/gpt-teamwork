@@ -1,6 +1,6 @@
 import * as amqp from 'amqplib';
-import { AI, STEPS, createSend } from '../../libs'
-import { queueNames } from '../../config'
+import { AI, STEPS } from '@gpt-team/ai'
+import { queueNames, createSend } from '@gpt-team/channel'
 import { createDbs } from './dbs';
 
 import path from 'path';

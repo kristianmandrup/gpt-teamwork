@@ -109,6 +109,41 @@ Output that is a deliverables should be marked with `[-DELIVERABLE-]`. The `fs-w
 
 This could further be expanded to include writing files to local and remote git repos etc.  
 
+### Software Development Life Cycle (SDLC)
+
+The SDLC for any sub/team or engineer is roughly as follows:
+
+- analysis
+- design
+- development & testing
+- deployment
+
+Each agent can define a `phases` folder with a `phase-order.yaml` file.
+The phases folder should contain one folder per phase, such as `analysis`.
+
+## Phase folder instructions
+
+The particular phase folder such as `analysis` should have
+
+A `goal.md` describing the goal of that phase for the particular agent (to be fed as first input to AI).
+
+There should also be a `phase-tasks` folder with a folder for each type of task, such as `use-cases` 
+The `phase-tasks` folder should have a `task-order.yaml` files which outlines the order of tasks to be performed.
+
+`task-order.yaml`
+
+```yaml
+- [requirements, features]
+- user-personas
+- user-stories
+- story-boarding
+```
+
+If tasks can be performed in parallel you can put several task names for an item, such as `[requirements, features]`
+
+The agent will process tasks in phase and task order to eventually create deliverables. 
+For a UI agent this may include use case diagrams, user stories, design system description and UI/UX code etc.
+
 ### Shared Libs
 
 The `libs` folder contains functionality that can be reused across agents and apps.

@@ -1,0 +1,12 @@
+Before getting the software product out the door to the production environment, it’s important to have your quality assurance team perform validation testing to make sure it is functioning properly and does what it’s meant to do. The testing process can also help hash out any major user experience issues and security issues. 
+
+In some cases, software testing can be done in a simulated environment. Other simpler tests can also be automated. 
+
+The types of testing to do in this phase:
+
+Performance testing: Assesses the software's speed and scalability under different conditions
+Functional testing: Verifies that the software meets the requirements
+Security testing: Identifies potential vulnerabilities and weaknesses
+Unit-testing: Tests individual units or components of the software
+Usability testing: Evaluates the software's user interface and overall user experience
+Acceptance testing: Also termed end-user testing, beta testing, application testing, or field testing, this is the final testing stage to test if the software product delivers on what it promises

@@ -1,0 +1,16 @@
+The first phase of the SDLC is the project planning stage where you are gathering business requirements from your client or stakeholders. This phase is when you evaluate the feasibility of creating the product, revenue potential, the cost of production, the needs of the end-users, etc.
+
+To properly decide what to make, what not to make, and what to make first, you can use a feature prioritization framework that takes into account the value of the software/update, the cost, the time it takes to build, and other factors.
+
+Once it is decided that the software project is in line with business and stakeholder goals, feasible to create, and addresses user needs, then you can move on to the next phase.
+
+The analysis stage includes gathering all the specific details required for a new system as well as determining the first ideas for prototypes.
+
+Developers may:
+
+Define any prototype system requirements
+Evaluate alternatives to existing prototypes
+Perform research and analysis to determine the needs of end-users
+Furthermore, developers will often create a software requirement specification or SRS document.
+
+This includes all the specifications for software, hardware, and network requirements for the system they plan to build. This will prevent them from overdrawing funding or resources when working at the same place as other development teams.

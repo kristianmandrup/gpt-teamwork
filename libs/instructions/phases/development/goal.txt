@@ -1,0 +1,1 @@
+The actual development phase is where the development team members divide the project into software modules and turn the software requirement into code that makes the product. 
