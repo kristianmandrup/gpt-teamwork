@@ -129,6 +129,9 @@ importers:
       '@gpt-team/ai':
         specifier: workspace:*
         version: link:../ai
+      '@gpt-team/phases':
+        specifier: workspace:*
+        version: link:../phases
 
   libs/db: {}
 

@@ -1,6 +1,8 @@
 import { AI, runPhaseStep } from "@gpt-team/ai";
 import type { OutputOpts } from "@gpt-team/ai";
-import { queueNames, createSend, parseMsg } from "@gpt-team/channel";
+import { createSend } from "./send";
+import { parseMsg } from "./parse";
+import { queueNames } from "./config";
 import { ConsumeMessage } from "amqplib";
 
 export type ConsumerOpts = {

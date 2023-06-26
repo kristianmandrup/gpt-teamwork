@@ -1,8 +1,29 @@
-# GPT-teamwork
+<!-- vscode-markdown-toc -->
+* 1. [AI team](#AIteam)
+* 2. [Quick start](#Quickstart)
+* 3. [Project Design](#ProjectDesign)
+* 4. [Workspaces](#Workspaces)
+	* 4.1. [Run commands with Nx](#RuncommandswithNx)
+	* 4.2. [Start](#Start)
+	* 4.3. [Apps](#Apps)
+	* 4.4. [Agents](#Agents)
+	* 4.5. [Software Development Life Cycle (SDLC)](#SoftwareDevelopmentLifeCycleSDLC)
+* 5. [Phase folder instructions](#Phasefolderinstructions)
+	* 5.1. [Parallel tasks](#Paralleltasks)
+	* 5.2. [Task processing](#Taskprocessing)
+	* 5.3. [Shared Libs](#SharedLibs)
+	* 5.4. [Channels](#Channels)
+	* 5.5. [Tests](#Tests)
+
+<!-- vscode-markdown-toc-config
+	numbering=true
+	autoSave=true
+	/vscode-markdown-toc-config -->
+<!-- /vscode-markdown-toc --># GPT-teamwork
 
 GPT agents acting as a team, each agent with a distinct role, working on a project collaboratively, sharing output using queues.
 
-## AI team
+##  1. <a name='AIteam'></a>AI team
 
 Prompt engineering examples and experiments for the AI engineering team can be found in the folder
 
@@ -16,7 +37,7 @@ Please write an App component with a header, footer, left sidebar, right sidebar
 Each component should be placed in a separate file. Make sure that any component or functionality that is reused in multiple components is extracted into its own file and referenced. 
 ```
 
-## Quick start
+##  2. <a name='Quickstart'></a>Quick start
 
 The apps and agents are started using [PM2](https://pm2.keymetrics.io/docs/usage/quick-start/)
 
@@ -38,13 +59,13 @@ To interact with the system and kick things off:
 
 `node start/cli`
 
-## Project Design
+##  3. <a name='ProjectDesign'></a>Project Design
 
 This project is designed as a PNPM workspace.
 
 See [Managing a full-stack, multipackage monorepo using pnpm](https://blog.logrocket.com/managing-full-stack-monorepo-pnpm/)
 
-## Workspaces
+##  4. <a name='Workspaces'></a>Workspaces
 
 The workspaces are:
 
@@ -69,7 +90,7 @@ Add a package to the ai workspace
 
 `pnpm add --filter ai openai`
 
-### Run commands with Nx
+###  4.1. <a name='RuncommandswithNx'></a>Run commands with Nx
 
 Build `ai` workspace
 
@@ -79,20 +100,20 @@ Build all
 
 `npx nx run-many --target=build --all`
 
-### Start
+###  4.2. <a name='Start'></a>Start
 
 The `start` folder will include various ways to start/intertact with the system.
 
 Currently `start` includes a `cli` project which lets you input the title and description for a project which is sent to the server projects endpoint via a `POST` request (axios).
 
-### Apps
+###  4.3. <a name='Apps'></a>Apps
 
 The `apps` folder contains one or more apps.
 The `server` app runs a web server with one or more endpoints which are the entry points for the end user (client) to communicate with the GPT team.
 
 The endpoint takes the incoming project description and puts it on a queue.
 
-### Agents
+###  4.4. <a name='Agents'></a>Agents
 
 The `agents` folder contains a number of agents. Each agent should be designed with prompts to pursue specific goals depending on the team role.
 
@@ -113,7 +134,7 @@ Output that is a deliverables should be marked with `[-DELIVERABLE-]`. The `fs-w
 
 This could further be expanded to include writing files to local and remote git repos etc.  
 
-### Software Development Life Cycle (SDLC)
+###  4.5. <a name='SoftwareDevelopmentLifeCycleSDLC'></a>Software Development Life Cycle (SDLC)
 
 The SDLC for any sub/team or engineer is roughly as follows:
 
@@ -125,7 +146,7 @@ The SDLC for any sub/team or engineer is roughly as follows:
 Each agent can define a `phases` folder with a `phase-order.yaml` file.
 The phases folder should contain one folder per phase, such as `analysis`.
 
-## Phase folder instructions
+##  5. <a name='Phasefolderinstructions'></a>Phase folder instructions
 
 The particular phase folder such as `analysis` should have
 
@@ -143,13 +164,16 @@ The `phase-tasks` folder should have a `task-order.yaml` files which outlines th
 - story-boarding
 ```
 
-If tasks can be performed in parallel you can put several task names for an item, such as `[requirements, features]`
+###  5.1. <a name='Paralleltasks'></a>Parallel tasks
+
+If tasks can be performed in parallel you can put several task names for an item, such as `[requirements, features]` (not yet supported)
+
+###  5.2. <a name='Taskprocessing'></a>Task processing
 
 The agent will process tasks in phase and task order to eventually create deliverables. 
 For a UI agent this may include use case diagrams, user stories, design system description and UI/UX code etc.
 
 To load the phases and tasks use the tooling in `@gpt-team/phases` under the `libs/phases` folder.
-It currently includes some interfaces that can be implemented and simple implementations for loading phases and tasks from the file system.
 
 Each phase task is a folder (by default) which can have:
 
@@ -158,16 +182,17 @@ Each phase task is a folder (by default) which can have:
 
 The config may include
 
-- User inputs: User prompts to ask the user to feed additional information
-- Channel info: `subscribe` and `publish` channels 
-- What to output: 
+- User `inputs`: User prompts to ask the user to feed additional information
+- `channel` info: `subscribe` and `publish` channels 
+- What to `output`: 
+  - `name` such as `use cases`
   - `type` ie. `diagram`, `code`, `documentation`, ...
   - `format` 
   - etc.
 
 In general, the only major step left in this design is to implement the proper step logic leveraging the phases/tasks architecture.
 
-### Shared Libs
+###  5.3. <a name='SharedLibs'></a>Shared Libs
 
 The `libs` folder contains functionality that can be reused across agents and apps.
 
@@ -177,7 +202,7 @@ The `@gpt-team/ai` library contains AI functionality (currently from `GPT-engine
 
 The `@gpt-team/db` library contains DB functionality to maintain AI context, logging etc.
 
-### Channels
+###  5.4. <a name='Channels'></a>Channels
 
 Currently the following channels are available
 
@@ -195,7 +220,7 @@ Currently the following channels are available
 - `deliverables` for deliverables
 - `status` to monitor and check product status
 
-### Tests
+###  5.5. <a name='Tests'></a>Tests
 
 The `tests` folder may include E2E tests in the future. 
 

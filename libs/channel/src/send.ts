@@ -10,7 +10,7 @@ export type SendOpts = {
     output?: OutputOpts
 }
 
-export const createSend = (channel: any, queueName: string, sender: string, opts: SendOpts) => async ({messages, meta}: MsgPayload ) => {
+export const createSend = (channel: any, queueName: string, sender: string, opts?: SendOpts) => async ({messages, meta}: MsgPayload ) => {
     await channel.assertQueue(queueName);
     opts = opts || {}
     meta ={
