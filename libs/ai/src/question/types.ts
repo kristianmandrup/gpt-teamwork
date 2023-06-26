@@ -15,5 +15,6 @@ export type OutputOpts = {
     task: IPhaseTask
     output?: OutputOpts
     inputs?: string[]
+    getUserMsg?: () => string
     config?: any
   }

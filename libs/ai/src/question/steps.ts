@@ -1,7 +1,6 @@
 import { IAIToolkit } from '../ai/types';
 import { toFiles } from '../response-parser';
 import { DBs } from '@gpt-team/db'
-import { IPhaseTask } from '@gpt-team/phases'
 import { PhaseStepOpts } from './types';
 import { ChatCompletionRequestMessage } from 'openai';
 
@@ -27,26 +26,25 @@ function setupSysPrompt(dbs: DBs): string {
   return dbs.identity.getItem('setup') + '\nUseful to know:\n' + dbs.identity.getItem('philosophy');
 }
 
-async function run(ai: IAIToolkit, dbs: DBs) {
-  const messages = await ai.start(setupSysPrompt(dbs), dbs.input.getItem('main_prompt'));
-  const lastMessage = messages[messages.length - 1];
-  if (!lastMessage) return [];
-  await toFiles(dbs.workspace, lastMessage.content);
-  return messages;
-}
+const getLastResponseMessage = (messages: ChatCompletionRequestMessage[]): string | undefined => { 
+  return messages[messages.length - 1]?.content
+};
 
-const getLastResponseMessage = (response: ChatCompletionRequestMessage[]) => {
-  const lastMessage = response[response.length - 1] || {};
-  return lastMessage.content;  
+export async function run(ai: IAIToolkit, dbs: DBs) {
+  const messages = await ai.start(setupSysPrompt(dbs), dbs.input.getItem('main_prompt'));
+  const lastMessage = getLastResponseMessage(messages);
+  if (!lastMessage) return [];
+  await toFiles(dbs.workspace, lastMessage);
+  return messages;
 }
 
 const command = (content: string | undefined) => content ? content.trim().toLowerCase() : ''
 
-enum Control {
+export enum Control {
   ABORT
 } 
 
-const createUserMessage = async (content: string): Promise<ChatCompletionRequestMessage | Control> => {
+export const createUserMessage = async (content: string): Promise<ChatCompletionRequestMessage | Control> => {
   let user = await question('(answer in text, or "q" to move on)\n');
   // console.log(`User input: ${user}`);  
   if (!user || user === 'q') {
@@ -58,29 +56,59 @@ const createUserMessage = async (content: string): Promise<ChatCompletionRequest
 
 export type RunPhaseStep = (opts: PhaseStepOpts) => Promise<ChatCompletionRequestMessage[] | undefined>
 
-export async function runPhaseStep({ai, dbs, task, inputs, output, config}: PhaseStepOpts): Promise<ChatCompletionRequestMessage[] | undefined> {
+export const createGetUserMsg = (dbs: DBs) => () => dbs.input.getItem('ui_user')
+
+export const createAiResponse = (opts: any) => async ({messages, prompt}: any) => {
+  const { ai, output } = opts
+  if (!ai) {
+    throw 'aiResponse: Missing ai instance'
+  }
+  const response: ChatCompletionRequestMessage[] = await opts.ai.next({messages, prompt, output});
+  return getLastResponseMessage(response)
+} 
+
+export type PromptAiOpts = {
+  aiResponse?: (opts: any) => Promise<string | undefined>
+  messages: ChatCompletionRequestMessage[]
+  prompt: string
+  opts?: any
+}
+
+export const promptAi = async ({aiResponse, messages, prompt, opts}: PromptAiOpts) => {
+    aiResponse = aiResponse || createAiResponse(opts)
+    if (!aiResponse) {
+      throw 'promptAi: missing aiResponse'
+    }       
+    const content = await aiResponse({messages, prompt})
+    // use output name and type
+    const possibleCommand = command(content);
+    if (!content || possibleCommand === 'no') {
+      return Control.ABORT;
+    }  
+    // { role: 'user', content: user }
+    const userMessage = await createUserMessage(content)
+    if (userMessage == Control.ABORT) return Control.ABORT;
+    messages.push(userMessage);
+}
+
+export async function runPhaseStep({ai, dbs, task, inputs, getUserMsg, output, config}: PhaseStepOpts): Promise<ChatCompletionRequestMessage[] | undefined> {
   console.log('run phase step')
   // TODO: use inputs and config
   await task.loadMessages();
   const message = await task.nextMessage();
   if (!message) return
+
   const chatMsg = ai.fsystem(message);
   const messages = [chatMsg];  
-  let user: any = dbs.input.getItem('ui_user');
+  getUserMsg = getUserMsg || createGetUserMsg(dbs)
+  
+  let prompt: any = getUserMsg();
 
   // TODO: ...
   while (true) {
-    // use output name and type
-    const response = await ai.next({messages, prompt: user, output});
-    const content = getLastResponseMessage(response)
-    const possibleCommand = command(content);
-    if (!content || possibleCommand === 'no') {
-      break;
-    }  
-    // { role: 'user', content: user }
-    const userMessage = await createUserMessage(content)
-    if (userMessage == Control.ABORT) break;
-    messages.push(userMessage);
+    const opts = {ai, output}
+    const result = await promptAi({messages, prompt, opts})
+    if (result == Control.ABORT) break;
   }
   return messages;
 }
