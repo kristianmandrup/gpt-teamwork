@@ -112,6 +112,10 @@ export class FilePhase extends FilePhaseHandler implements IPhase {
         return path.parse(this.folderPath).name
     }
 
+    getGoal(): string {
+        return this.goal
+    }
+
     async loadGoal() {        
         if (this.goal) return;
         const doc = fs.readFileSync(this.goalPath, 'utf-8');

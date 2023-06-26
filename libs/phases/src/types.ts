@@ -10,6 +10,7 @@ export interface IPhase {
     name: string
     isDone(): boolean
     setDone(): void
+    getGoal(): string
     loadGoal(): Promise<void>
     nextTask(): Promise<IPhaseTask | undefined>
 }
