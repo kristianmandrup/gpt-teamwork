@@ -4,21 +4,25 @@ import { ConsumeMessage } from "amqplib";
 import { IPhase, FilePhases } from "@gpt-team/phases";
 import { MessageBus } from "./channel";
 import { createConsumer } from "./consume";
+import { runPhaseStep } from "@gpt-team/ai";
 
+export type TeamProps = {
+  name: string
+}
 
 export type ProcessPhasesOps = {
     basePath: string
     createDbs: any
     mqUrl: string
-    teamName: string
+    team: TeamProps
 }
   
 export const terminationMsgs = ['COMPLETED', 'TERMINATED']
 
 // Function to process project descriptions and generate use cases
-export async function setupAgentMessageBusProcessor({basePath, mqUrl, createDbs, teamName}: ProcessPhasesOps) {
+export async function setupAgentMessageBusProcessor({basePath, mqUrl, createDbs, team}: ProcessPhasesOps) {
     const isTeamDone = ({ body }: any) => {
-        return terminationMsgs.includes(body.message) && body.sender == teamName
+        return terminationMsgs.includes(body.message) && body.sender == team.name
       }
 
     // Db
@@ -49,6 +53,7 @@ export async function setupAgentMessageBusProcessor({basePath, mqUrl, createDbs,
   
       const chn = channel.getRawChannel()
       phase = await phases.nextPhase();
+      const run = runPhaseStep
   
       while (!phases.isDone()) {
         const task = await phases.nextTask();
@@ -59,7 +64,7 @@ export async function setupAgentMessageBusProcessor({basePath, mqUrl, createDbs,
         const config = await task.getConfig();
         const { subscribe } = config.channels || {};
         for (var sub of subscribe) {
-          const consume = createConsumer({channel, dbs, task, config})
+          const consume = createConsumer({channel, dbs, phase, task, config, run})
           await chn.assertQueue(sub);
           // create subscription
           channel.consume(sub, consume)

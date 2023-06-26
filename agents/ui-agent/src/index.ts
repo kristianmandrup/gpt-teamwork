@@ -6,7 +6,9 @@ const mqUrl = "amqp://localhost";
 
 const basePath = path.join(process.cwd(), "agents", "ui-agent", "db");
 
-const teamName = 'ui'
+const team = {
+    name: 'ui'
+}
 
 // Start processing project descriptions
-setupAgentMessageBusProcessor({basePath, mqUrl, createDbs, teamName});
+setupAgentMessageBusProcessor({basePath, mqUrl, createDbs, team});

@@ -22,6 +22,7 @@ export interface IPhaseTasks {
 
 export interface IPhaseTask {
     name: string
+    getPhase(): IPhase
     loadMessages(): Promise<void>
     nextMessage(): Promise<string | undefined>
     getConfig(): Promise<any>;

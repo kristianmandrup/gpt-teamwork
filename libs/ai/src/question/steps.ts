@@ -1,7 +1,9 @@
-import { AI}  from '../ai';
+import { IAIToolkit } from '../ai/types';
 import { toFiles } from '../response-parser';
 import { DBs } from '@gpt-team/db'
 import { IPhaseTask } from '@gpt-team/phases'
+import { PhaseStepOpts } from './types';
+import { ChatCompletionRequestMessage } from 'openai';
 
 const readline = require('readline');
 
@@ -25,7 +27,7 @@ function setupSysPrompt(dbs: DBs): string {
   return dbs.identity.getItem('setup') + '\nUseful to know:\n' + dbs.identity.getItem('philosophy');
 }
 
-async function run(ai: AI, dbs: DBs) {
+async function run(ai: IAIToolkit, dbs: DBs) {
   const messages = await ai.start(setupSysPrompt(dbs), dbs.input.getItem('main_prompt'));
   const lastMessage = messages[messages.length - 1];
   if (!lastMessage) return [];
@@ -33,23 +35,30 @@ async function run(ai: AI, dbs: DBs) {
   return messages;
 }
 
-export type OutputOpts = {
-  name: string
-  type: string
-  language?: string
-  ext?: string
+const getLastResponseMessage = (response: ChatCompletionRequestMessage[]) => {
+  const lastMessage = response[response.length - 1] || {};
+  return lastMessage.content;  
 }
 
-export type PhaseStepOpts = {
-  ai: AI
-  dbs: DBs
-  task: IPhaseTask
-  output?: OutputOpts
-  inputs?: string[]
-  config?: any
+const command = (content: string | undefined) => content ? content.trim().toLowerCase() : ''
+
+enum Control {
+  ABORT
+} 
+
+const createUserMessage = async (content: string): Promise<ChatCompletionRequestMessage | Control> => {
+  let user = await question('(answer in text, or "q" to move on)\n');
+  // console.log(`User input: ${user}`);  
+  if (!user || user === 'q') {
+    return Control.ABORT
+  }
+  user += '\n\n' + 'Is anything else unclear? If yes, only answer in the form:\n' + '{remaining unclear areas} remaining questions.\n' + '{Next question}\n' + 'If everything is sufficiently clear, only answer "no".';
+  return { role: 'user', content: user }
 }
 
-export async function runPhaseStep({ai, dbs, task, inputs, output, config}: PhaseStepOpts) {
+export type RunPhaseStep = (opts: PhaseStepOpts) => Promise<ChatCompletionRequestMessage[] | undefined>
+
+export async function runPhaseStep({ai, dbs, task, inputs, output, config}: PhaseStepOpts): Promise<ChatCompletionRequestMessage[] | undefined> {
   console.log('run phase step')
   // TODO: use inputs and config
   await task.loadMessages();
@@ -58,26 +67,20 @@ export async function runPhaseStep({ai, dbs, task, inputs, output, config}: Phas
   const chatMsg = ai.fsystem(message);
   const messages = [chatMsg];  
   let user: any = dbs.input.getItem('ui_user');
+
   // TODO: ...
   while (true) {
     // use output name and type
     const response = await ai.next({messages, prompt: user, output});
-    const lastMessage = response[response.length - 1] || {};
-    const content = lastMessage.content;
-    // TODO: refactor/extract and make generic/configurable
-    const possibleCommand = content ? content.trim().toLowerCase() : ''
+    const content = getLastResponseMessage(response)
+    const possibleCommand = command(content);
     if (!content || possibleCommand === 'no') {
       break;
-    }
-    user = await question('(answer in text, or "q" to move on)\n');
-    console.log(`User input: ${user}`);  
-    //user = prompt('(answer in text, or "q" to move on)\n');
-    //console.log();
-    if (!user || user === 'q') {
-      break;
-    }
-    user += '\n\n' + 'Is anything else unclear? If yes, only answer in the form:\n' + '{remaining unclear areas} remaining questions.\n' + '{Next question}\n' + 'If everything is sufficiently clear, only answer "no".';
-    messages.push({ role: 'user', content: user });
+    }  
+    // { role: 'user', content: user }
+    const userMessage = await createUserMessage(content)
+    if (userMessage == Control.ABORT) break;
+    messages.push(userMessage);
   }
   return messages;
 }

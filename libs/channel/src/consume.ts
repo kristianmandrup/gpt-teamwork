@@ -1,19 +1,23 @@
-import { AI, runPhaseStep } from "@gpt-team/ai";
+import { AI, RunPhaseStep } from "@gpt-team/ai";
 import type { OutputOpts } from "@gpt-team/ai";
 import { createSend } from "./send";
 import { parseMsg } from "./parse";
 import { queueNames } from "./config";
 import { ConsumeMessage } from "amqplib";
 
+import { IPhase } from "@gpt-team/phases";
+
 export type ConsumerOpts = {
     ai?: any
     channel: any
     dbs: any
     task: any
+    phase?: IPhase
     config?: any
+    run: RunPhaseStep
 }
 
-export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) => async (cmsg: ConsumeMessage) => {
+export const createConsumer = ({ai, channel, dbs, task, phase, runPhaseStep, config }: ConsumerOpts) => async (cmsg: ConsumeMessage) => {
     // OpenAI options
     const model = process.env.GPT_MODEL;
     const temperature = process.env.TEMPERATURE;
@@ -38,7 +42,7 @@ export const createConsumer = ({ai, channel, dbs, task, config }: ConsumerOpts) 
     ]
 
     // TODO: send msgContent as initial input?
-    const messages = await runPhaseStep({ai, dbs, inputs, output, task});
+    const messages = await run({ai, dbs, inputs, output, task});
     const text = JSON.stringify(messages);
 
     // dbs.logs.setItem(step.name, text);

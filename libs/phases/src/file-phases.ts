@@ -105,7 +105,7 @@ export class FilePhase extends FilePhaseHandler implements IPhase {
         this.folderPath = folderPath;
         this.goalPath = path.join(this.folderPath, 'goal.md');
         this.phaseTasksPath = path.join(this.folderPath, 'phase-tasks');
-        this.phaseTasks = new PhaseTasks(this.phaseTasksPath);
+        this.phaseTasks = new PhaseTasks(this, this.phaseTasksPath);
     }
 
     get name(): string {
@@ -132,13 +132,19 @@ export class PhaseTasks extends FilePhaseHandler implements IPhaseTasks {
     private tasks: IPhaseTask[] = [];
     private currentTask?: IPhaseTask;
     private done: boolean = false;
+    private phase: IPhase;
 
     isDone(): boolean {
         return this.done
     }
 
-    constructor(tasksPath: string) {
+    getPhase(): IPhase {
+        return this.phase
+    }
+
+    constructor(phase: IPhase, tasksPath: string) {
         super()
+        this.phase = phase;
         this.tasksPath = tasksPath;
     }
 
@@ -166,7 +172,7 @@ export class PhaseTasks extends FilePhaseHandler implements IPhaseTasks {
             return this.indexof(f1) <= this.indexof(f2) ? 1 : 0;
         });
         for (const folderPath of sortedFolders) {
-            const task = new FilePhaseTask(folderPath)
+            const task = new FilePhaseTask(this.getPhase(), folderPath)
             this.tasks.push(task)
         }        
     }
@@ -190,6 +196,7 @@ export class FilePhaseTask extends FilePhaseHandler implements IPhaseTask {
     private messages: string[] = [];
     private config: any;
     private done: boolean = false;
+    private phase: IPhase
 
     isDone(): boolean {
         return this.done
@@ -199,14 +206,19 @@ export class FilePhaseTask extends FilePhaseHandler implements IPhaseTask {
         return path.parse(this.folderPath).name
     }
 
-    constructor(folderPath: string) {
+    constructor(phase: IPhase, folderPath: string) {
         super();
+        this.phase = phase
         this.folderPath = folderPath;
     }
 
     async getConfig() {
         await this.loadConfig();
         return this.config;
+    }
+
+    getPhase(): IPhase {
+        return this.phase
     }
 
     // TODO: only txt and md files
